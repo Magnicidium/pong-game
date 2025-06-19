@@ -4,14 +4,18 @@ const ctx = canvas.getContext("2d");
 
 const paddleWidth = 22;
 const paddleHeight = 120;
-const ballSize = 30;
+const ballRadius = 15;
 
 let leftPaddleY = canvas.height / 2 - paddleHeight / 2;
 let rightPaddleY = canvas.height / 2 - paddleHeight / 2;
-let ballX = canvas.width / 2 - ballSize / 2;
-let ballY = canvas.height / 2 - ballSize / 2;
+let ballX = canvas.width / 2;
+let ballY = canvas.height / 2;
 let ballVX = 4;
 let ballVY = 3;
+
+let leftScore = 0;
+let rightScore = 0;
+let gameOver = false;
 
 canvas.addEventListener("mousemove", (e) => {
     const rect = canvas.getBoundingClientRect();
@@ -30,55 +34,82 @@ function draw() {
     ctx.fillRect(0, leftPaddleY, paddleWidth, paddleHeight);
     ctx.fillRect(canvas.width - paddleWidth, rightPaddleY, paddleWidth, paddleHeight);
 
-    // Draw ball
-    ctx.fillRect(ballX, ballY, ballSize, ballSize);
+    // Draw ball as a circle
+    ctx.beginPath();
+    ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw scores
+    ctx.font = "32px Arial";
+    ctx.fillText(leftScore, canvas.width / 4, 40);
+    ctx.fillText(rightScore, (canvas.width / 4) * 3, 40);
+
+    // Game Over message
+    if (gameOver) {
+        ctx.font = "48px Arial";
+        ctx.fillText("Game Over", canvas.width / 2 - 120, canvas.height / 2);
+    }
 }
 
 function update() {
+    if (gameOver) return;
+
     ballX += ballVX;
     ballY += ballVY;
 
     // Wall bounce
-    if (ballY <= 0 || ballY + ballSize >= canvas.height) {
+    if (ballY - ballRadius <= 0 || ballY + ballRadius >= canvas.height) {
         ballVY *= -1;
     }
 
     // Right paddle collision
     if (
-        ballX + ballSize >= canvas.width - paddleWidth &&
-        ballY + ballSize > rightPaddleY &&
+        ballX + ballRadius >= canvas.width - paddleWidth &&
+        ballY > rightPaddleY &&
         ballY < rightPaddleY + paddleHeight
     ) {
         ballVX *= -1;
-        ballX = canvas.width - paddleWidth - ballSize;
+        ballX = canvas.width - paddleWidth - ballRadius;
     }
 
     // Left paddle collision
     if (
-        ballX <= paddleWidth &&
-        ballY + ballSize > leftPaddleY &&
+        ballX - ballRadius <= paddleWidth &&
+        ballY > leftPaddleY &&
         ballY < leftPaddleY + paddleHeight
     ) {
         ballVX *= -1;
-        ballX = paddleWidth;
+        ballX = paddleWidth + ballRadius;
     }
 
-    // Missed paddle (reset)
-    if (ballX < 0 || ballX > canvas.width) {
-        ballX = canvas.width / 2 - ballSize / 2;
-        ballY = canvas.height / 2 - ballSize / 2;
-        ballVX = Math.random() > 0.5 ? 4 : -4;
-        ballVY = Math.random() > 0.5 ? 3 : -3;
+    // Score conditions
+    if (ballX < 0) {
+        rightScore++;
+        resetBall();
+    } else if (ballX > canvas.width) {
+        leftScore++;
+        resetBall();
     }
 
-    // Simple AI for left paddle
-    const ballCenter = ballY + ballSize / 2;
+    if (leftScore === 10 || rightScore === 10) {
+        gameOver = true;
+    }
+
+    // AI for left paddle
+    const ballCenter = ballY;
     const paddleCenter = leftPaddleY + paddleHeight / 2;
     if (paddleCenter < ballCenter - 5) {
         leftPaddleY = clamp(leftPaddleY + 2, 0, canvas.height - paddleHeight);
     } else if (paddleCenter > ballCenter + 5) {
         leftPaddleY = clamp(leftPaddleY - 2, 0, canvas.height - paddleHeight);
     }
+}
+
+function resetBall() {
+    ballX = canvas.width / 2;
+    ballY = canvas.height / 2;
+    ballVX = Math.random() > 0.5 ? 4 : -4;
+    ballVY = Math.random() > 0.5 ? 3 : -3;
 }
 
 function loop() {

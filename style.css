@@ -1,7 +1,7 @@
 
 body {
     margin: 0;
-    background-color: #000;
+    background: transparent;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -9,6 +9,5 @@ body {
 }
 
 canvas {
-    background: #111;
-    border: 2px solid #fff;
+    background: transparent;
 }
