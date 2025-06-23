@@ -13,7 +13,7 @@ let rightPaddleY = canvas.height / 2 - paddleHeight / 2;
 let ballX = canvas.width / 2;
 let ballY = canvas.height / 2;
 
-let ballSpeed = 4; // increased initial speed
+let ballSpeed = 5; // increased initial speed
 let ballAngle = Math.random() * Math.PI / 4 - Math.PI / 8;
 let ballVX = Math.cos(ballAngle) * ballSpeed * (Math.random() > 0.5 ? 1 : -1);
 let ballVY = Math.sin(ballAngle) * ballSpeed;
@@ -136,7 +136,7 @@ function update() {
 function resetBall() {
     ballX = canvas.width / 2;
     ballY = canvas.height / 2;
-    ballSpeed = 4;
+    ballSpeed = 5;
     const angle = Math.random() * Math.PI / 4 - Math.PI / 8;
     const direction = Math.random() > 0.5 ? 1 : -1;
     ballVX = Math.cos(angle) * ballSpeed * direction;
