@@ -1,6 +1,8 @@
+
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
 
 const paddleWidth = 22;
 const paddleHeight = 120;
@@ -11,7 +13,7 @@ let rightPaddleY = canvas.height / 2 - paddleHeight / 2;
 let ballX = canvas.width / 2;
 let ballY = canvas.height / 2;
 
-let ballSpeed = 3;
+let ballSpeed = 4; // increased initial speed
 let ballAngle = Math.random() * Math.PI / 4 - Math.PI / 8;
 let ballVX = Math.cos(ballAngle) * ballSpeed * (Math.random() > 0.5 ? 1 : -1);
 let ballVY = Math.sin(ballAngle) * ballSpeed;
@@ -26,11 +28,26 @@ canvas.addEventListener("mousemove", (e) => {
     rightPaddleY = e.clientY - rect.top - paddleHeight / 2;
 });
 
+canvas.addEventListener("touchmove", (e) => {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    rightPaddleY = touch.clientY - rect.top - paddleHeight / 2;
+}, { passive: false });
+
 startBtn.addEventListener("click", () => {
     startBtn.style.display = "none";
     canvas.style.display = "block";
     gameStarted = true;
     loop();
+});
+
+restartBtn.addEventListener("click", () => {
+    leftScore = 0;
+    rightScore = 0;
+    gameOver = false;
+    resetBall();
+    restartBtn.style.display = "none";
 });
 
 function clamp(value, min, max) {
@@ -102,8 +119,9 @@ function update() {
         resetBall();
     }
 
-    if (leftScore === 10 || rightScore === 10) {
+    if (leftScore === 7 || rightScore === 7) {
         gameOver = true;
+        restartBtn.style.display = "block";
     }
 
     const ballCenter = ballY;
@@ -118,7 +136,7 @@ function update() {
 function resetBall() {
     ballX = canvas.width / 2;
     ballY = canvas.height / 2;
-    ballSpeed = 3;
+    ballSpeed = 4;
     const angle = Math.random() * Math.PI / 4 - Math.PI / 8;
     const direction = Math.random() > 0.5 ? 1 : -1;
     ballVX = Math.cos(angle) * ballSpeed * direction;
