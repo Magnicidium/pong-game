@@ -13,7 +13,7 @@ let rightPaddleY = canvas.height / 2 - paddleHeight / 2;
 let ballX = canvas.width / 2;
 let ballY = canvas.height / 2;
 
-let ballSpeed = 5; // increased initial speed
+let ballSpeed = 5;
 let ballAngle = Math.random() * Math.PI / 4 - Math.PI / 8;
 let ballVX = Math.cos(ballAngle) * ballSpeed * (Math.random() > 0.5 ? 1 : -1);
 let ballVY = Math.sin(ballAngle) * ballSpeed;
@@ -46,8 +46,8 @@ restartBtn.addEventListener("click", () => {
     leftScore = 0;
     rightScore = 0;
     gameOver = false;
-    resetBall();
     restartBtn.style.display = "none";
+    resetBall();
 });
 
 function clamp(value, min, max) {
@@ -61,9 +61,11 @@ function draw() {
     ctx.fillRect(0, leftPaddleY, paddleWidth, paddleHeight);
     ctx.fillRect(canvas.width - paddleWidth, rightPaddleY, paddleWidth, paddleHeight);
 
-    ctx.beginPath();
-    ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
-    ctx.fill();
+    if (!gameOver) {
+        ctx.beginPath();
+        ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+        ctx.fill();
+    }
 
     ctx.font = "32px Arial";
     ctx.fillText(leftScore, canvas.width / 4, 40);
@@ -71,7 +73,9 @@ function draw() {
 
     if (gameOver) {
         ctx.font = "48px Arial";
-        ctx.fillText("Game Over", canvas.width / 2 - 120, canvas.height / 2);
+        ctx.textAlign = "center";
+        const message = leftScore === 7 ? "You Win!" : "You Lose";
+        ctx.fillText(message, canvas.width / 2, canvas.height / 2 - 20);
     }
 }
 
@@ -119,7 +123,7 @@ function update() {
         resetBall();
     }
 
-    if (leftScore === 7 || rightScore === 7) {
+    if ((leftScore === 7 || rightScore === 7) && !gameOver) {
         gameOver = true;
         restartBtn.style.display = "block";
     }
@@ -134,6 +138,8 @@ function update() {
 }
 
 function resetBall() {
+    if (gameOver) return;
+
     ballX = canvas.width / 2;
     ballY = canvas.height / 2;
     ballSpeed = 5;

@@ -9,7 +9,16 @@ body {
     flex-direction: column;
 }
 
+#canvasWrapper {
+    width: 100%;
+    max-width: 990px;
+    aspect-ratio: 990 / 545;
+    position: relative;
+}
+
 canvas {
+    width: 100%;
+    height: 100%;
     background: transparent;
     display: none;
 }
